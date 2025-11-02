@@ -21,6 +21,9 @@ public class GameController {
                 case MvcGameKeys.DOWN_KEY:
                     model.moveCannonDown();
                     break;
+                case MvcGameKeys.SPACE_KEY:
+                    model.cannonShoot();
+                    break;
                 case MvcGameKeys.ESCAPE_KEY:
                     System.exit(0);
                     break;
@@ -29,5 +32,6 @@ public class GameController {
             }
         }
         model.update();
+        pressedKeysCodes.clear(); //solves problem with multiple shots being fired for single press, as a side effect causes delay in the movement input
     }
 }
