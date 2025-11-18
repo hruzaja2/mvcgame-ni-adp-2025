@@ -17,7 +17,9 @@ public class MvcGameConfig {
     public static final int INIT_POWER = 10;
     public static final double ANGLE_STEP = Math.PI / 18;
     public static final int POWER_STEP = 1;
-    public static final double GRAVITY = 9.8;
+    public static final double GRAVITY = 9.81;
+    public static final int MAGIC_TIME_CONST = 100;
+
 
 
 }

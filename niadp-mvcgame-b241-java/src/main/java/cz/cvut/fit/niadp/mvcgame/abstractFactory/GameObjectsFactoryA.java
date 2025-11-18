@@ -24,7 +24,8 @@ public class GameObjectsFactoryA implements IGameObjectsFactory{
         return new MissileA(
             new Position(model.getCannonPosition().getX(), model.getCannonPosition().getY()),
             initAngle,
-            initVelocity
+            initVelocity,
+            model.getMovingStrategy()
         );
     }
 

@@ -39,6 +39,12 @@ public class GameController {
                 case MvcGameKeys.POWER_DOWN_KEY:
                     model.cannonPowerDown();
                     break;
+                case MvcGameKeys.TOGGLE_MOVING_STRATEGY_KEY:
+                    model.toggleMovingStrategy();
+                    break;
+                case MvcGameKeys.TOGGLE_SHOOTING_MODE_KEY:
+                    model.toggleShootingMode();
+                    break;
                 default: 
                     //nothing
             }
