@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import cz.cvut.fit.niadp.mvcgame.abstractFactory.GameObjectsFactoryA;
@@ -14,7 +13,6 @@ import cz.cvut.fit.niadp.mvcgame.config.MvcGameConfig;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.AbstractCannon;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.AbstractMissile;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.GameObject;
-import cz.cvut.fit.niadp.mvcgame.observer.IObservable;
 import cz.cvut.fit.niadp.mvcgame.observer.IObserver;
 import cz.cvut.fit.niadp.mvcgame.proxy.IGameModel;
 import cz.cvut.fit.niadp.mvcgame.strategy.IMovingStrategy;
@@ -62,7 +60,12 @@ public class GameModel implements IGameModel{
 
     protected void destroyMissiles(){
         missiles.removeAll(
-            missiles.stream().filter(missile -> missile.getPosition().getX() > MvcGameConfig.MAX_X)
+            missiles.stream().filter(missile -> 
+                missile.getPosition().getX() > MvcGameConfig.MAX_X 
+                || missile.getPosition().getX() < MvcGameConfig.MIN_X
+                || missile.getPosition().getY() > MvcGameConfig.MAX_Y
+                || missile.getPosition().getY() < MvcGameConfig.MIN_Y
+            )
             .toList()
         );
     }
