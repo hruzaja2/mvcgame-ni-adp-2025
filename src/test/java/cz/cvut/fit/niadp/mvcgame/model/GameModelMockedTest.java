@@ -6,6 +6,8 @@ import org.junit.Test;
 import cz.cvut.fit.niadp.mvcgame.abstractFactory.GameObjectsFactoryA;
 import cz.cvut.fit.niadp.mvcgame.abstractFactory.IGameObjectsFactory;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.AbstractMissile;
+import cz.cvut.fit.niadp.mvcgame.pool.MissilePool;
+import cz.cvut.fit.niadp.mvcgame.strategy.RealMovingStrategy;
 import mockit.Mock;
 import mockit.MockUp;
 import mockit.Mocked;
@@ -21,7 +23,8 @@ public class GameModelMockedTest {
     @Test
     public void createMissileTest() {
         generalMocks();
-        IGameObjectsFactory factory = new GameObjectsFactoryA(model);
+        MissilePool pool = new MissilePool(10, new RealMovingStrategy());
+        IGameObjectsFactory factory = new GameObjectsFactoryA(model, pool);
         AbstractMissile missile = factory.createMissile(INIT_ANGLE, INIT_VELOCITY);
         Assert.assertEquals(CANNON_POS_X, missile.getPosition().getX());
         Assert.assertEquals(CANNON_POS_Y, missile.getPosition().getY());

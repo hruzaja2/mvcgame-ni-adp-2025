@@ -42,7 +42,11 @@ public class CannonA extends AbstractCannon {
     }
 
     public void primitiveShoot(){
-       shootingBatch.add(gameObjectsFactory.createMissile(angle, power));
+       AbstractMissile missile = gameObjectsFactory.createMissile(angle, power);
+       // Only add if missile was created (pool not empty)
+       if(missile != null) {
+           shootingBatch.add(missile);
+       }
     }
 
     @Override

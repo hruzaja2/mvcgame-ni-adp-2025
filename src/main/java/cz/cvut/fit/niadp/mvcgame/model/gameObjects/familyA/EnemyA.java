@@ -7,12 +7,12 @@ import cz.cvut.fit.niadp.mvcgame.model.gameObjects.AbstractEnemy;
 
 public class EnemyA extends AbstractEnemy {
 
-    public EnemyA(Position position, int health, int speed) {
-        super(position, health, speed);
+    public EnemyA(Position position, int health, int speed, int scoreValue) {
+        super(position, health, speed, scoreValue);
     }
 
     @Override
-    public void move() {
+    protected void performMove() {
         // Nepřítel se pohybuje DOLEVA (vpravo → vlevo)
         move(new Vector(-speed, 0));  // Negativní X = doleva
     }

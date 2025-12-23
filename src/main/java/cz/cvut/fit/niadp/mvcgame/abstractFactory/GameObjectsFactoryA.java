@@ -10,14 +10,17 @@ import cz.cvut.fit.niadp.mvcgame.model.gameObjects.decorator.PiercingMissileDeco
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.familyA.CannonA;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.familyA.EnemyA;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.familyA.MissileA;
+import cz.cvut.fit.niadp.mvcgame.pool.MissilePool;
 import cz.cvut.fit.niadp.mvcgame.proxy.IGameModel;
 
 public class GameObjectsFactoryA implements IGameObjectsFactory{
 
     protected final IGameModel model;
+    protected final MissilePool missilePool;
 
-    public GameObjectsFactoryA(IGameModel model){
+    public GameObjectsFactoryA(IGameModel model, MissilePool missilePool){
         this.model = model;
+        this.missilePool = missilePool;
     }
 
     @Override
@@ -27,12 +30,18 @@ public class GameObjectsFactoryA implements IGameObjectsFactory{
 
     @Override
     public AbstractMissile createMissile(double initAngle, int initVelocity) {
-        AbstractMissile missile = new MissileA(
+        // Use Object Pool instead of creating new missile
+        AbstractMissile missile = missilePool.acquire(
             new Position(model.getCannonPosition().getX(), model.getCannonPosition().getY()),
             initAngle,
             initVelocity,
             model.getMovingStrategy()
         );
+
+        // If pool is empty, return null
+        if(missile == null) {
+            return null;
+        }
 
         // Apply decorators based on active power-ups
         if(model.isExplosiveMissiles()){
@@ -49,7 +58,16 @@ public class GameObjectsFactoryA implements IGameObjectsFactory{
     }
 
     @Override
-    public AbstractEnemy createEnemy(Position position, int health, int speed) {
-        return new EnemyA(position, health, speed);
+    public AbstractEnemy createEnemy(Position position) {
+        // Randomly create different enemy types
+        // 60% Fast, 30% Tank, 10% Boss
+        double random = Math.random();
+        if(random < 0.6) {
+            return new cz.cvut.fit.niadp.mvcgame.model.gameObjects.familyA.FastEnemy(position);
+        } else if(random < 0.9) {
+            return new cz.cvut.fit.niadp.mvcgame.model.gameObjects.familyA.TankEnemy(position);
+        } else {
+            return new cz.cvut.fit.niadp.mvcgame.model.gameObjects.familyA.BossEnemy(position);
+        }
     }
 }

@@ -16,6 +16,7 @@ import cz.cvut.fit.niadp.mvcgame.model.gameObjects.AbstractMissile;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.GameObject;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.GameInfo;
 import cz.cvut.fit.niadp.mvcgame.observer.IObserver;
+import cz.cvut.fit.niadp.mvcgame.pool.MissilePool;
 import cz.cvut.fit.niadp.mvcgame.proxy.IGameModel;
 import cz.cvut.fit.niadp.mvcgame.state.IShootingMode;
 import cz.cvut.fit.niadp.mvcgame.strategy.IMovingStrategy;
@@ -30,6 +31,7 @@ public class GameModel implements IGameModel{
     private final Set<IObserver> observers;
     private final GameInfo gameInfo;
     private IGameObjectsFactory factory;
+    private final MissilePool missilePool;
     protected IMovingStrategy movingStrategy;
     protected final Queue<AbstractGameCommand> unexecutedCommands;
     protected final Stack<AbstractGameCommand> executedCommands;
@@ -44,13 +46,14 @@ public class GameModel implements IGameModel{
     private boolean showHelp = false;
 
     public GameModel(){
-        factory = new GameObjectsFactoryA(this);
+        movingStrategy = new RealMovingStrategy();
+        missilePool = new MissilePool(MvcGameConfig.MAX_MISSILES, movingStrategy);
+        factory = new GameObjectsFactoryA(this, missilePool);
         observers = new HashSet<IObserver>();
         cannon = factory.createCannon();
         missiles = new HashSet<AbstractMissile>();
         enemies = new HashSet<AbstractEnemy>();
         gameInfo = new GameInfo(this);
-        movingStrategy = new RealMovingStrategy();
         unexecutedCommands = new LinkedBlockingQueue<>();
         executedCommands = new Stack<>();
     }
@@ -77,15 +80,17 @@ public class GameModel implements IGameModel{
     }
 
     protected void destroyMissiles(){
-        missiles.removeAll(
-            missiles.stream().filter(missile ->
-                missile.getPosition().getX() > MvcGameConfig.MAX_X
-                || missile.getPosition().getX() < MvcGameConfig.MIN_X
-                || missile.getPosition().getY() > MvcGameConfig.MAX_Y
-                || missile.getPosition().getY() < MvcGameConfig.MIN_Y
-            )
-            .toList()
-        );
+        var missilesToRemove = missiles.stream().filter(missile ->
+            missile.getPosition().getX() > MvcGameConfig.MAX_X
+            || missile.getPosition().getX() < MvcGameConfig.MIN_X
+            || missile.getPosition().getY() > MvcGameConfig.MAX_Y
+            || missile.getPosition().getY() < MvcGameConfig.MIN_Y
+        ).toList();
+
+        // Return missiles to pool (unwrap decorators first)
+        missilesToRemove.forEach(missile -> missilePool.release(missile.unwrap()));
+
+        missiles.removeAll(missilesToRemove);
     }
 
     protected void moveEnemies(){
@@ -100,13 +105,14 @@ public class GameModel implements IGameModel{
             || !enemy.isAlive()
         ).toList();
 
-        // Count killed enemies for score
-        long killedEnemies = enemiesToRemove.stream()
+        // Add score for killed enemies (using their scoreValue)
+        int scoreGained = enemiesToRemove.stream()
             .filter(enemy -> !enemy.isAlive())
-            .count();
+            .mapToInt(AbstractEnemy::getScoreValue)
+            .sum();
 
-        if(killedEnemies > 0){
-            gameInfo.incrementScore((int)killedEnemies);
+        if(scoreGained > 0){
+            gameInfo.incrementScore(scoreGained);
         }
 
         enemies.removeAll(enemiesToRemove);
@@ -118,7 +124,7 @@ public class GameModel implements IGameModel{
             // Random Y position in the middle area of the screen
             int randomY = MvcGameConfig.MIN_Y + 100 + (int)(Math.random() * (MvcGameConfig.MAX_Y - 200));
             Position spawnPosition = new Position(MvcGameConfig.MAX_X, randomY);
-            enemies.add(factory.createEnemy(spawnPosition, 3, 2));
+            enemies.add(factory.createEnemy(spawnPosition));
         }
     }
 
@@ -139,6 +145,9 @@ public class GameModel implements IGameModel{
                 }
             }
         }
+
+        // Return missiles to pool (unwrap decorators first)
+        missilesToRemove.forEach(missile -> missilePool.release(missile.unwrap()));
 
         missiles.removeAll(missilesToRemove);
         if(!missilesToRemove.isEmpty()){
@@ -171,9 +180,13 @@ public class GameModel implements IGameModel{
     }
 
     public void cannonShoot(){
-        // Check missile limit before shooting
-        if(missiles.size() < MvcGameConfig.MAX_MISSILES){
-            missiles.addAll(cannon.shoot());
+        // No need to check missile limit - pool handles it automatically
+        var newMissiles = cannon.shoot();
+        // Filter out nulls (in case pool is empty)
+        newMissiles.stream()
+            .filter(missile -> missile != null)
+            .forEach(missiles::add);
+        if(!newMissiles.isEmpty()){
             notifyObservers();
         }
     }

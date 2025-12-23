@@ -6,8 +6,8 @@ import cz.cvut.fit.niadp.mvcgame.strategy.IMovingStrategy;
 
 public abstract class AbstractMissile extends LifetimeLimitedGameObject {
 
-    private final double initAngle;
-    private final int initVelocity;
+    private double initAngle;
+    private int initVelocity;
     protected IMovingStrategy movingStrategy;
 
     protected AbstractMissile(Position initPosition, double initAngle, int initVelocity, IMovingStrategy movingStrategy) {
@@ -15,6 +15,18 @@ public abstract class AbstractMissile extends LifetimeLimitedGameObject {
         this.initAngle = initAngle;
         this.initVelocity = initVelocity;
         this.movingStrategy = movingStrategy;
+    }
+
+    /**
+     * Resets missile state for Object Pool pattern reuse
+     */
+    public void reset(Position newPosition, double newAngle, int newVelocity, IMovingStrategy newStrategy) {
+        this.position.setX(newPosition.getX());
+        this.position.setY(newPosition.getY());
+        this.initAngle = newAngle;
+        this.initVelocity = newVelocity;
+        this.movingStrategy = newStrategy;
+        this.resetAge(); // Reset birth time for RealMovingStrategy
     }
 
     public void accept(IVisitor visitor){
@@ -42,5 +54,13 @@ public abstract class AbstractMissile extends LifetimeLimitedGameObject {
 
     public boolean shouldDestroyOnHit(){
         return true; // Default: destroy on hit
+    }
+
+    /**
+     * Unwraps decorated missiles to get the base missile for Object Pool
+     * Override in decorators to unwrap
+     */
+    public AbstractMissile unwrap() {
+        return this; // Base missiles return themselves
     }
 }

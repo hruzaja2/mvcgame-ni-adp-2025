@@ -32,4 +32,9 @@ public abstract class AbstractMissileDecorator extends AbstractMissile {
     public boolean shouldDestroyOnHit() {
         return decoratedMissile.shouldDestroyOnHit();
     }
+
+    @Override
+    public AbstractMissile unwrap() {
+        return decoratedMissile.unwrap(); // Recursively unwrap all decorators
+    }
 }
