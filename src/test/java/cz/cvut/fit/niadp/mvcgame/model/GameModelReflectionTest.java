@@ -20,13 +20,13 @@ public class GameModelReflectionTest {
         method.setAccessible(true);
         IntStream.rangeClosed(ITERATION_START_CONST, AIM_COUNT).forEach(i->model.aimCannonUp());
         IntStream.rangeClosed(ITERATION_START_CONST, MISSILE_COUNT).forEach(i->model.cannonShoot());
-        Assert.assertEquals(MISSILE_COUNT + 1, model.getGameObjects().size());
+        Assert.assertEquals(MISSILE_COUNT + 2, model.getGameObjects().size()); // missiles + cannon + gameInfo
         IntStream.rangeClosed(ITERATION_START_CONST, MOVE_COUNT).forEach(i-> {
             try {
                 method.invoke(model);
             } catch (IllegalAccessException | InvocationTargetException ignored) {}
         });
         method.setAccessible(false);
-        Assert.assertEquals(EXPECTED_MISSILES_COUNT, model.getGameObjects().size() - 1); //gameObjects contain cannon
+        Assert.assertEquals(EXPECTED_MISSILES_COUNT, model.getGameObjects().size() - 2); //gameObjects contain cannon and gameInfo
     }
 }

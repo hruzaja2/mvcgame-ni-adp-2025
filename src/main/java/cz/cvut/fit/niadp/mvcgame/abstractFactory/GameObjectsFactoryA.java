@@ -2,7 +2,9 @@ package cz.cvut.fit.niadp.mvcgame.abstractFactory;
 
 import cz.cvut.fit.niadp.mvcgame.config.MvcGameConfig;
 import cz.cvut.fit.niadp.mvcgame.model.Position;
+import cz.cvut.fit.niadp.mvcgame.model.gameObjects.AbstractEnemy;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.familyA.CannonA;
+import cz.cvut.fit.niadp.mvcgame.model.gameObjects.familyA.EnemyA;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.familyA.MissileA;
 import cz.cvut.fit.niadp.mvcgame.proxy.IGameModel;
 
@@ -29,5 +31,8 @@ public class GameObjectsFactoryA implements IGameObjectsFactory{
         );
     }
 
-
+    @Override
+    public AbstractEnemy createEnemy(Position position, int health, int speed) {
+        return new EnemyA(position, health, speed);
+    }
 }

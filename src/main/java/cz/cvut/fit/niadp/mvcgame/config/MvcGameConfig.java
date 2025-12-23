@@ -22,6 +22,7 @@ public class MvcGameConfig {
     public static final double GRAVITY = 9.81;
     public static final int MAGIC_TIME_CONST = 100;
 
+    public static final int MAX_MISSILES = 70;
 
 
 }

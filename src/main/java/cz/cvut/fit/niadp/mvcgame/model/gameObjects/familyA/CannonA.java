@@ -72,5 +72,15 @@ public class CannonA extends AbstractCannon {
 
         }
     }
-    
+
+    @Override
+    public double getAngle(){
+        return angle;
+    }
+
+    @Override
+    public int getPower(){
+        return power;
+    }
+
 }

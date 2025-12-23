@@ -4,6 +4,7 @@ import java.util.Set;
 
 import cz.cvut.fit.niadp.mvcgame.command.AbstractGameCommand;
 import cz.cvut.fit.niadp.mvcgame.model.Position;
+import cz.cvut.fit.niadp.mvcgame.model.gameObjects.AbstractCannon;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.AbstractMissile;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.GameObject;
 import cz.cvut.fit.niadp.mvcgame.observer.IObservable;
@@ -24,6 +25,7 @@ public interface IGameModel extends IObservable {
     public void cannonPowerDown();
     public Set<AbstractMissile> getMissiles();
     public Set<GameObject> getGameObjects();
+    public AbstractCannon getCannon();
     public IMovingStrategy getMovingStrategy();
     public void toggleMovingStrategy();
     public IMovingStrategy getNextMovingStrategy(SimpleMovingStrategy strategy);

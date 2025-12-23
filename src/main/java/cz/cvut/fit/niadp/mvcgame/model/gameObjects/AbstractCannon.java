@@ -22,6 +22,13 @@ public  abstract class AbstractCannon extends GameObject {
     public abstract List<AbstractMissile> shoot();
     public abstract void primitiveShoot();
 
+    public abstract double getAngle();
+    public abstract int getPower();
+
+    public IShootingMode getShootingMode(){
+        return shootingMode;
+    }
+
     public void accept(IVisitor visitor){
         visitor.visit(this);
     }
