@@ -83,4 +83,14 @@ public class CannonA extends AbstractCannon {
         return power;
     }
 
+    @Override
+    public void setAngle(double angle){
+        this.angle = angle;
+    }
+
+    @Override
+    public void setPower(int power){
+        this.power = power;
+    }
+
 }

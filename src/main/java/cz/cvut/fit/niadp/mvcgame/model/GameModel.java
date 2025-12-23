@@ -17,6 +17,7 @@ import cz.cvut.fit.niadp.mvcgame.model.gameObjects.GameObject;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.GameInfo;
 import cz.cvut.fit.niadp.mvcgame.observer.IObserver;
 import cz.cvut.fit.niadp.mvcgame.proxy.IGameModel;
+import cz.cvut.fit.niadp.mvcgame.state.IShootingMode;
 import cz.cvut.fit.niadp.mvcgame.strategy.IMovingStrategy;
 import cz.cvut.fit.niadp.mvcgame.strategy.RandomMovingStrategy;
 import cz.cvut.fit.niadp.mvcgame.strategy.RealMovingStrategy;
@@ -33,6 +34,14 @@ public class GameModel implements IGameModel{
     protected final Queue<AbstractGameCommand> unexecutedCommands;
     protected final Stack<AbstractGameCommand> executedCommands;
     private int frameCount = 0;
+
+    // Power-ups
+    private boolean explosiveMissiles = false;
+    private boolean fastMissiles = false;
+    private boolean piercingMissiles = false;
+
+    // Help
+    private boolean showHelp = false;
 
     public GameModel(){
         factory = new GameObjectsFactoryA(this);
@@ -117,11 +126,16 @@ public class GameModel implements IGameModel{
         Set<AbstractMissile> missilesToRemove = new HashSet<>();
 
         for(AbstractMissile missile : missiles){
+            boolean hitSomething = false;
             for(AbstractEnemy enemy : enemies){
                 if(isColliding(missile, enemy)){
                     enemy.hit();
-                    missilesToRemove.add(missile);
-                    break; // One missile can only hit one enemy
+                    hitSomething = true;
+                    if(missile.shouldDestroyOnHit()){
+                        missilesToRemove.add(missile);
+                        break; // Non-piercing missile stops at first hit
+                    }
+                    // Piercing missiles continue to next enemy
                 }
             }
         }
@@ -132,14 +146,14 @@ public class GameModel implements IGameModel{
         }
     }
 
-    protected boolean isColliding(GameObject obj1, GameObject obj2){
-        final int COLLISION_RADIUS = 30;
+    protected boolean isColliding(AbstractMissile missile, AbstractEnemy enemy){
+        int collisionRadius = missile.getCollisionRadius();
 
-        int dx = obj1.getPosition().getX() - obj2.getPosition().getX();
-        int dy = obj1.getPosition().getY() - obj2.getPosition().getY();
+        int dx = missile.getPosition().getX() - enemy.getPosition().getX();
+        int dy = missile.getPosition().getY() - enemy.getPosition().getY();
         double distance = Math.sqrt(dx * dx + dy * dy);
 
-        return distance < COLLISION_RADIUS;
+        return distance < collisionRadius;
     }
 
     public Position getCannonPosition(){
@@ -248,16 +262,57 @@ public class GameModel implements IGameModel{
         cannon.toggleShootingMode();
     }
 
+    public void toggleExplosiveMissiles(){
+        explosiveMissiles = !explosiveMissiles;
+    }
+
+    public void toggleFastMissiles(){
+        fastMissiles = !fastMissiles;
+    }
+
+    public void togglePiercingMissiles(){
+        piercingMissiles = !piercingMissiles;
+    }
+
+    public boolean isExplosiveMissiles(){
+        return explosiveMissiles;
+    }
+
+    public boolean isFastMissiles(){
+        return fastMissiles;
+    }
+
+    public boolean isPiercingMissiles(){
+        return piercingMissiles;
+    }
+
+    public void toggleHelp(){
+        showHelp = !showHelp;
+    }
+
+    public boolean isShowHelp(){
+        return showHelp;
+    }
+
     private static class Memento{
         private int cannonPositionX;
         private int cannonPositionY;
-        // game snapshot
+        private double cannonAngle;
+        private int cannonPower;
+        private IShootingMode shootingMode;
+        private IMovingStrategy movingStrategy;
+        private int score;
     }
 
     public Object createMemento(){
         Memento gameModelSnapshot = new Memento();
         gameModelSnapshot.cannonPositionX = cannon.getPosition().getX();
         gameModelSnapshot.cannonPositionY = cannon.getPosition().getY();
+        gameModelSnapshot.cannonAngle = cannon.getAngle();
+        gameModelSnapshot.cannonPower = cannon.getPower();
+        gameModelSnapshot.shootingMode = cannon.getShootingMode();
+        gameModelSnapshot.movingStrategy = movingStrategy;
+        gameModelSnapshot.score = gameInfo.getScore();
         return gameModelSnapshot;
     }
 
@@ -265,6 +320,11 @@ public class GameModel implements IGameModel{
         Memento gameModelSnapshot = (Memento)memento;
         cannon.getPosition().setX(gameModelSnapshot.cannonPositionX);
         cannon.getPosition().setY(gameModelSnapshot.cannonPositionY);
+        cannon.setAngle(gameModelSnapshot.cannonAngle);
+        cannon.setPower(gameModelSnapshot.cannonPower);
+        cannon.setShootingMode(gameModelSnapshot.shootingMode);
+        movingStrategy = gameModelSnapshot.movingStrategy;
+        gameInfo.setScore(gameModelSnapshot.score);
     }
 
     @Override

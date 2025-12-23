@@ -127,6 +127,46 @@ public class GameModelProxy implements IGameModel{
     }
 
     @Override
+    public void toggleExplosiveMissiles() {
+        subject.toggleExplosiveMissiles();
+    }
+
+    @Override
+    public void toggleFastMissiles() {
+        subject.toggleFastMissiles();
+    }
+
+    @Override
+    public void togglePiercingMissiles() {
+        subject.togglePiercingMissiles();
+    }
+
+    @Override
+    public boolean isExplosiveMissiles() {
+        return subject.isExplosiveMissiles();
+    }
+
+    @Override
+    public boolean isFastMissiles() {
+        return subject.isFastMissiles();
+    }
+
+    @Override
+    public boolean isPiercingMissiles() {
+        return subject.isPiercingMissiles();
+    }
+
+    @Override
+    public void toggleHelp() {
+        subject.toggleHelp();
+    }
+
+    @Override
+    public boolean isShowHelp() {
+        return subject.isShowHelp();
+    }
+
+    @Override
     public Object createMemento() {
        return subject.createMemento();
     }

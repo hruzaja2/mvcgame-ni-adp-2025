@@ -28,7 +28,19 @@ public abstract class AbstractMissile extends LifetimeLimitedGameObject {
         return initVelocity;
     }
 
+    public IMovingStrategy getMovingStrategy() {
+        return movingStrategy;
+    }
+
     public void move(){
         movingStrategy.updatePosition(this);
+    }
+
+    public int getCollisionRadius(){
+        return 30; // Default collision radius
+    }
+
+    public boolean shouldDestroyOnHit(){
+        return true; // Default: destroy on hit
     }
 }

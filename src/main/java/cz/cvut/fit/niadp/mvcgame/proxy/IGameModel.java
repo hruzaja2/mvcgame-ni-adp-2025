@@ -32,6 +32,14 @@ public interface IGameModel extends IObservable {
     public IMovingStrategy getNextMovingStrategy(RandomMovingStrategy strategy);
     public IMovingStrategy getNextMovingStrategy(RealMovingStrategy strategy);
     public void toggleShootingMode();
+    public void toggleExplosiveMissiles();
+    public void toggleFastMissiles();
+    public void togglePiercingMissiles();
+    public boolean isExplosiveMissiles();
+    public boolean isFastMissiles();
+    public boolean isPiercingMissiles();
+    public void toggleHelp();
+    public boolean isShowHelp();
     public Object createMemento();
     public void setMemento(Object memento);
     public void registerCommand(AbstractGameCommand command);

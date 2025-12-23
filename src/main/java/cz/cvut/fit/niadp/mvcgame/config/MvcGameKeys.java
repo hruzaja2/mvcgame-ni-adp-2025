@@ -17,9 +17,17 @@ public class MvcGameKeys {
     public static final String TOGGLE_MOVING_STRATEGY_KEY = "M";
     public static final String TOGGLE_SHOOTING_MODE_KEY = "N";
 
-    
+
     public static final String STORE_GAME_SNAPSHOT_KEY = "S";
     public static final String RESTORE_GAME_SNAPSHOT_KEY = "X";
     public static final String UNDO_LAST_COMMAND_KEY = "C";
+
+    // Power-ups
+    public static final String TOGGLE_EXPLOSIVE_KEY = "E";
+    public static final String TOGGLE_FAST_KEY = "Q";
+    public static final String TOGGLE_PIERCING_KEY = "P";
+
+    // Help
+    public static final String TOGGLE_HELP_KEY = "H";
 
 }

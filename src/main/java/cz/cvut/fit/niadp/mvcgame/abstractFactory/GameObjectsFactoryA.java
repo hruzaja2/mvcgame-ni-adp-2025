@@ -3,6 +3,10 @@ package cz.cvut.fit.niadp.mvcgame.abstractFactory;
 import cz.cvut.fit.niadp.mvcgame.config.MvcGameConfig;
 import cz.cvut.fit.niadp.mvcgame.model.Position;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.AbstractEnemy;
+import cz.cvut.fit.niadp.mvcgame.model.gameObjects.AbstractMissile;
+import cz.cvut.fit.niadp.mvcgame.model.gameObjects.decorator.ExplosiveMissileDecorator;
+import cz.cvut.fit.niadp.mvcgame.model.gameObjects.decorator.FastMissileDecorator;
+import cz.cvut.fit.niadp.mvcgame.model.gameObjects.decorator.PiercingMissileDecorator;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.familyA.CannonA;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.familyA.EnemyA;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.familyA.MissileA;
@@ -22,13 +26,26 @@ public class GameObjectsFactoryA implements IGameObjectsFactory{
     }
 
     @Override
-    public MissileA createMissile(double initAngle, int initVelocity) {
-        return new MissileA(
+    public AbstractMissile createMissile(double initAngle, int initVelocity) {
+        AbstractMissile missile = new MissileA(
             new Position(model.getCannonPosition().getX(), model.getCannonPosition().getY()),
             initAngle,
             initVelocity,
             model.getMovingStrategy()
         );
+
+        // Apply decorators based on active power-ups
+        if(model.isExplosiveMissiles()){
+            missile = new ExplosiveMissileDecorator(missile);
+        }
+        if(model.isFastMissiles()){
+            missile = new FastMissileDecorator(missile);
+        }
+        if(model.isPiercingMissiles()){
+            missile = new PiercingMissileDecorator(missile);
+        }
+
+        return missile;
     }
 
     @Override

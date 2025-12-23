@@ -24,9 +24,15 @@ public  abstract class AbstractCannon extends GameObject {
 
     public abstract double getAngle();
     public abstract int getPower();
+    public abstract void setAngle(double angle);
+    public abstract void setPower(int power);
 
     public IShootingMode getShootingMode(){
         return shootingMode;
+    }
+
+    public void setShootingMode(IShootingMode mode){
+        this.shootingMode = mode;
     }
 
     public void accept(IVisitor visitor){

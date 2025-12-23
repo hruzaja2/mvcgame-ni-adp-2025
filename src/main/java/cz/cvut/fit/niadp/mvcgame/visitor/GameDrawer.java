@@ -65,6 +65,49 @@ public class GameDrawer implements IVisitor{
         gameGraphics.drawText("Power: " + cannon.getPower(), new Position(10, startY + 2 * lineHeight));
         gameGraphics.drawText("Mode: " + shootingMode, new Position(10, startY + 3 * lineHeight));
         gameGraphics.drawText("Strategy: " + strategyName, new Position(10, startY + 4 * lineHeight));
+
+        // Power-ups display
+        String powerups = "Power-ups: ";
+        if(model.isExplosiveMissiles()) powerups += "[E]Explosive ";
+        if(model.isFastMissiles()) powerups += "[Q]Fast ";
+        if(model.isPiercingMissiles()) powerups += "[P]Piercing ";
+        if(!model.isExplosiveMissiles() && !model.isFastMissiles() && !model.isPiercingMissiles()) {
+            powerups += "None";
+        }
+        gameGraphics.drawText(powerups, new Position(10, startY + 5 * lineHeight));
+
+        // Help text
+        if(model.isShowHelp()) {
+            int helpX = 600;
+            int helpY = 50;
+            int helpLineHeight = 25;
+            int line = 0;
+
+            gameGraphics.drawText("=== CONTROLS (Press H to hide) ===", new Position(helpX, helpY + line++ * helpLineHeight));
+            line++;
+            gameGraphics.drawText("Movement:", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  UP/DOWN - Move cannon", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  A/Y - Aim up/down", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  F/D - Power up/down", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  SPACE - Shoot", new Position(helpX, helpY + line++ * helpLineHeight));
+            line++;
+            gameGraphics.drawText("Game modes:", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  M - Toggle moving strategy", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  N - Toggle shooting mode", new Position(helpX, helpY + line++ * helpLineHeight));
+            line++;
+            gameGraphics.drawText("Power-ups:", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  E - Explosive missiles", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  Q - Fast missiles", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  P - Piercing missiles", new Position(helpX, helpY + line++ * helpLineHeight));
+            line++;
+            gameGraphics.drawText("Other:", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  S - Save snapshot", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  X - Restore snapshot", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  C - Undo last command", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  ESC - Exit game", new Position(helpX, helpY + line++ * helpLineHeight));
+        } else {
+            gameGraphics.drawText("Press H for help", new Position(10, startY + 6 * lineHeight));
+        }
     }
 
     protected void drawGameObject(GameObject gameObject, String resource){
