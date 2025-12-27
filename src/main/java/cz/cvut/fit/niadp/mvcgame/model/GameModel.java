@@ -1,10 +1,16 @@
 package cz.cvut.fit.niadp.mvcgame.model;
 
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import cz.cvut.fit.niadp.mvcgame.abstractFactory.GameObjectsFactoryA;
 import cz.cvut.fit.niadp.mvcgame.abstractFactory.IGameObjectsFactory;
@@ -48,6 +54,9 @@ public class GameModel implements IGameModel{
     // Pause
     private boolean isPaused = false;
 
+    // Difficulty
+    private final DifficultyManager difficultyManager;
+
     public GameModel(){
         movingStrategy = new RealMovingStrategy();
         missilePool = new MissilePool(MvcGameConfig.MAX_MISSILES, movingStrategy);
@@ -59,6 +68,7 @@ public class GameModel implements IGameModel{
         gameInfo = new GameInfo(this);
         unexecutedCommands = new LinkedBlockingQueue<>();
         executedCommands = new Stack<>();
+        difficultyManager = new DifficultyManager();
     }
 
     public void update() {
@@ -143,8 +153,12 @@ public class GameModel implements IGameModel{
             return;
         }
 
-        // Spawn enemy every 60 frames (roughly 1 second at 60 FPS)
-        if(frameCount % 60 == 0){
+        // Update difficulty based on current score
+        difficultyManager.updateDifficulty(gameInfo.getScore());
+        int spawnInterval = difficultyManager.getCurrentStrategy().getSpawnInterval();
+
+        // Spawn enemy based on difficulty
+        if(frameCount % spawnInterval == 0){
             // Random Y position in the middle area of the screen
             int randomY = MvcGameConfig.MIN_Y + 100 + (int)(Math.random() * (MvcGameConfig.MAX_Y - 200));
             Position spawnPosition = new Position(MvcGameConfig.MAX_X, randomY);
@@ -178,6 +192,9 @@ public class GameModel implements IGameModel{
 
         // Reset frame count
         frameCount = 0;
+
+        // Reset difficulty
+        difficultyManager.reset();
 
         // Clear command history
         executedCommands.clear();
@@ -385,6 +402,10 @@ public class GameModel implements IGameModel{
         return isPaused;
     }
 
+    public int getDifficultyLevel(){
+        return difficultyManager.getCurrentLevel();
+    }
+
     private static class Memento{
         private int cannonPositionX;
         private int cannonPositionY;
@@ -434,6 +455,99 @@ public class GameModel implements IGameModel{
         if(!executedCommands.isEmpty()){
             executedCommands.pop().unExecute();
             notifyObservers();
+        }
+    }
+
+    public void saveGameToFile(String filename) {
+        GameSaveState saveState = new GameSaveState();
+
+        // Save cannon state
+        saveState.setCannonPositionX(cannon.getPosition().getX());
+        saveState.setCannonPositionY(cannon.getPosition().getY());
+        saveState.setCannonAngle(cannon.getAngle());
+        saveState.setCannonPower(cannon.getPower());
+        saveState.setShootingMode(cannon.getShootingMode().getName());
+
+        // Save game info
+        saveState.setScore(gameInfo.getScore());
+        saveState.setLives(gameInfo.getLives());
+        saveState.setFrameCount(frameCount);
+
+        // Save power-ups
+        saveState.setExplosiveMissiles(explosiveMissiles);
+        saveState.setFastMissiles(fastMissiles);
+        saveState.setPiercingMissiles(piercingMissiles);
+
+        // Save strategy
+        saveState.setMovingStrategy(movingStrategy.getClass().getSimpleName());
+
+        // Save game state
+        saveState.setPaused(isPaused);
+
+        // Serialize to JSON
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        try (FileWriter writer = new FileWriter(filename)) {
+            gson.toJson(saveState, writer);
+            System.out.println("Game saved to " + filename);
+        } catch (IOException e) {
+            System.err.println("Error saving game: " + e.getMessage());
+        }
+    }
+
+    public void loadGameFromFile(String filename) {
+        Gson gson = new Gson();
+        try (FileReader reader = new FileReader(filename)) {
+            GameSaveState saveState = gson.fromJson(reader, GameSaveState.class);
+
+            // Clear current game state
+            missiles.clear();
+            enemies.clear();
+
+            // Restore cannon state
+            cannon.getPosition().setX(saveState.getCannonPositionX());
+            cannon.getPosition().setY(saveState.getCannonPositionY());
+            cannon.setAngle(saveState.getCannonAngle());
+            cannon.setPower(saveState.getCannonPower());
+
+            // Restore shooting mode by name
+            cannon.setShootingModeByName(saveState.getShootingMode());
+
+            // Restore game info
+            gameInfo.setScore(saveState.getScore());
+            gameInfo.setLives(saveState.getLives());
+            frameCount = saveState.getFrameCount();
+
+            // Restore power-ups
+            explosiveMissiles = saveState.isExplosiveMissiles();
+            fastMissiles = saveState.isFastMissiles();
+            piercingMissiles = saveState.isPiercingMissiles();
+
+            // Restore strategy
+            switch (saveState.getMovingStrategy()) {
+                case "SimpleMovingStrategy":
+                    movingStrategy = new SimpleMovingStrategy();
+                    break;
+                case "RandomMovingStrategy":
+                    movingStrategy = new RandomMovingStrategy();
+                    break;
+                case "RealMovingStrategy":
+                    movingStrategy = new RealMovingStrategy();
+                    break;
+                default:
+                    movingStrategy = new RealMovingStrategy();
+            }
+
+            // Restore game state
+            isPaused = saveState.isPaused();
+
+            // Clear command history
+            executedCommands.clear();
+            unexecutedCommands.clear();
+
+            System.out.println("Game loaded from " + filename);
+            notifyObservers();
+        } catch (IOException e) {
+            System.err.println("Error loading game: " + e.getMessage());
         }
     }
 }

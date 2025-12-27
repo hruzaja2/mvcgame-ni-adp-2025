@@ -36,4 +36,8 @@ public class MvcGameKeys {
     // Pause
     public static final String PAUSE_KEY = "P";
 
+    // Save/Load to file
+    public static final String SAVE_GAME_KEY = "F5";
+    public static final String LOAD_GAME_KEY = "F9";
+
 }

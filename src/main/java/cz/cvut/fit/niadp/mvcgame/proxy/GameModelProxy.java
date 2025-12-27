@@ -205,4 +205,19 @@ public class GameModelProxy implements IGameModel{
     public boolean isPaused() {
         return subject.isPaused();
     }
+
+    @Override
+    public void saveGameToFile(String filename) {
+        subject.saveGameToFile(filename);
+    }
+
+    @Override
+    public void loadGameFromFile(String filename) {
+        subject.loadGameFromFile(filename);
+    }
+
+    @Override
+    public int getDifficultyLevel() {
+        return subject.getDifficultyLevel();
+    }
 }

@@ -48,4 +48,7 @@ public interface IGameModel extends IObservable {
     public void undoLastCommand();
     public boolean isGameOver();
     public void restartGame();
+    public void saveGameToFile(String filename);
+    public void loadGameFromFile(String filename);
+    public int getDifficultyLevel();
 }

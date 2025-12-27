@@ -62,10 +62,11 @@ public class GameDrawer implements IVisitor{
 
         gameGraphics.drawText("Score: " + gameInfo.getScore(), new Position(10, startY));
         gameGraphics.drawText("Lives: " + gameInfo.getLives(), new Position(10, startY + lineHeight));
-        gameGraphics.drawText("Angle: " + String.format("%.1f", cannon.getAngle()), new Position(10, startY + 2 * lineHeight));
-        gameGraphics.drawText("Power: " + cannon.getPower(), new Position(10, startY + 3 * lineHeight));
-        gameGraphics.drawText("Mode: " + shootingMode, new Position(10, startY + 4 * lineHeight));
-        gameGraphics.drawText("Strategy: " + strategyName, new Position(10, startY + 5 * lineHeight));
+        gameGraphics.drawText("Difficulty: Level " + model.getDifficultyLevel(), new Position(10, startY + 2 * lineHeight));
+        gameGraphics.drawText("Angle: " + String.format("%.1f", cannon.getAngle()), new Position(10, startY + 3 * lineHeight));
+        gameGraphics.drawText("Power: " + cannon.getPower(), new Position(10, startY + 4 * lineHeight));
+        gameGraphics.drawText("Mode: " + shootingMode, new Position(10, startY + 5 * lineHeight));
+        gameGraphics.drawText("Strategy: " + strategyName, new Position(10, startY + 6 * lineHeight));
 
         // Power-ups display
         String powerups = "Power-ups: ";
@@ -75,7 +76,7 @@ public class GameDrawer implements IVisitor{
         if(!model.isExplosiveMissiles() && !model.isFastMissiles() && !model.isPiercingMissiles()) {
             powerups += "None";
         }
-        gameGraphics.drawText(powerups, new Position(10, startY + 6 * lineHeight));
+        gameGraphics.drawText(powerups, new Position(10, startY + 7 * lineHeight));
 
         // Pause message
         if(model.isPaused()) {
@@ -120,13 +121,15 @@ public class GameDrawer implements IVisitor{
             line++;
             gameGraphics.drawText("Other:", new Position(helpX, helpY + line++ * helpLineHeight));
             gameGraphics.drawText("  P - Pause/Resume", new Position(helpX, helpY + line++ * helpLineHeight));
-            gameGraphics.drawText("  S - Save snapshot", new Position(helpX, helpY + line++ * helpLineHeight));
-            gameGraphics.drawText("  X - Restore snapshot", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  S - Save snapshot (memory)", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  X - Restore snapshot (memory)", new Position(helpX, helpY + line++ * helpLineHeight));
             gameGraphics.drawText("  C - Undo last command", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  F5 - Save to file", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  F9 - Load from file", new Position(helpX, helpY + line++ * helpLineHeight));
             gameGraphics.drawText("  R - Restart game", new Position(helpX, helpY + line++ * helpLineHeight));
             gameGraphics.drawText("  ESC - Exit game", new Position(helpX, helpY + line++ * helpLineHeight));
         } else {
-            gameGraphics.drawText("Press H for help", new Position(10, startY + 7 * lineHeight));
+            gameGraphics.drawText("Press H for help", new Position(10, startY + 8 * lineHeight));
         }
     }
 
