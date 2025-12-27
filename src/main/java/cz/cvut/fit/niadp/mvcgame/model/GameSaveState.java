@@ -10,7 +10,7 @@ public class GameSaveState {
     private int cannonPositionY;
     private double cannonAngle;
     private int cannonPower;
-    private String shootingMode; // "Single", "Double", "Triple"
+    private String shootingMode; // "Single", "Double"
 
     // Game info
     private int score;

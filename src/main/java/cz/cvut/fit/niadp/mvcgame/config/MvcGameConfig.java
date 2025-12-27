@@ -6,6 +6,8 @@ public class MvcGameConfig {
 
     }
 
+    public static final String GAME_TITLE = "The NI-ADP MvcGame";
+
     public static final int MAX_X = 1920;
     public static final int MAX_Y = 1080;
     public static final int MIN_X = 0;
@@ -23,7 +25,7 @@ public class MvcGameConfig {
     public static final int MAGIC_TIME_CONST = 100;
 
     public static final int MAX_MISSILES = 70;
-    public static final int INIT_LIVES = 3;
+    public static final int INIT_LIVES = 5;
 
 
 }

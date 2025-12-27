@@ -26,8 +26,8 @@ public class DifficultyManager {
     private final IDifficultyStrategy nightmareStrategy = new NightmareDifficultyStrategy();
 
     public DifficultyManager() {
-        currentStrategy = easyStrategy;
         currentLevel = 1;
+        currentStrategy = getStrategyForLevel(1); // Start with Beginner strategy
     }
 
     /**
@@ -58,18 +58,31 @@ public class DifficultyManager {
 
     /**
      * Get the appropriate strategy for a given level.
+     * Level 1 gets special beginner-friendly treatment.
      *
      * @param level difficulty level
      * @return difficulty strategy
      */
     private IDifficultyStrategy getStrategyForLevel(int level) {
-        if (level <= 2) {
+        if (level == 1) {
+            // Special beginner mode - extra slow spawn
+            return new IDifficultyStrategy() {
+                @Override
+                public int getSpawnInterval() {
+                    return 120; // Very slow - 2 seconds between spawns
+                }
+                @Override
+                public String getName() {
+                    return "Beginner";
+                }
+            };
+        } else if (level <= 3) {
             return easyStrategy;
-        } else if (level <= 4) {
+        } else if (level <= 5) {
             return mediumStrategy;
-        } else if (level <= 6) {
+        } else if (level <= 7) {
             return hardStrategy;
-        } else if (level <= 9) {
+        } else if (level <= 10) {
             return expertStrategy;
         } else {
             return nightmareStrategy;
@@ -98,7 +111,7 @@ public class DifficultyManager {
      * Reset difficulty to initial state.
      */
     public void reset() {
-        currentStrategy = easyStrategy;
         currentLevel = 1;
+        currentStrategy = getStrategyForLevel(1); // Reset to Beginner strategy
     }
 }

@@ -27,9 +27,7 @@ public class MvcGame {
         controller.processPressedKeys(pressedKeysCodes);
     }
 
-    public String getWindowTitle() {
-        return "The NI-ADP MvcGame";
-    }
+    public String getWindowTitle() { return MvcGameConfig.GAME_TITLE; }
 
     public int getWindowWidth() {
         return MvcGameConfig.MAX_X;

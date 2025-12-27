@@ -46,7 +46,7 @@ public  abstract class AbstractCannon extends GameObject {
                 this.shootingMode = new DoubleShootingMode();
                 break;
             default:
-                this.shootingMode = new SingleShootingMode();
+                this.shootingMode = new DoubleShootingMode(); // Default to Double
         }
     }
 

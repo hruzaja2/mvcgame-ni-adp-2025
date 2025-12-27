@@ -1,8 +1,12 @@
 package cz.cvut.fit.niadp.mvcgame.state;
 
+import cz.cvut.fit.niadp.mvcgame.config.MvcGameConfig;
+import cz.cvut.fit.niadp.mvcgame.model.Vector;
 import cz.cvut.fit.niadp.mvcgame.model.gameObjects.AbstractCannon;
 
 public class DoubleShootingMode implements IShootingMode {
+
+    private static final int VERTICAL_OFFSET = MvcGameConfig.MOVE_STEP * 2;
 
     @Override
     public String getName() {
@@ -11,12 +15,16 @@ public class DoubleShootingMode implements IShootingMode {
 
     @Override
     public void shoot(AbstractCannon cannon) {
-        cannon.aimUp();
+        // Shoot first missile slightly above
+        cannon.move(new Vector(0, -VERTICAL_OFFSET));
         cannon.primitiveShoot();
-        cannon.aimDown();
-        cannon.aimDown();
+
+        // Shoot second missile slightly below
+        cannon.move(new Vector(0, 2 * VERTICAL_OFFSET));
         cannon.primitiveShoot();
-        cannon.aimUp();
+
+        // Restore original position
+        cannon.move(new Vector(0, -VERTICAL_OFFSET));
     }
 
 }

@@ -16,6 +16,8 @@ public class GameModelReflectionTest {
     @Test
     public void moveMissilesTest() throws NoSuchMethodException {
         GameModel model = new GameModel();
+        // Set to Single mode to ensure consistent test behavior (default is now Double)
+        model.toggleShootingMode(); // Double -> Single
         Method method = model.getClass().getDeclaredMethod(MOVE_MISSILES_METHOD_NAME);
         method.setAccessible(true);
         IntStream.rangeClosed(ITERATION_START_CONST, AIM_COUNT).forEach(i->model.aimCannonUp());

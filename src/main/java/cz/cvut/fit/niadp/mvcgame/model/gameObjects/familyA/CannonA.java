@@ -23,7 +23,7 @@ public class CannonA extends AbstractCannon {
         this.gameObjectsFactory = gameObjectsFactory;
         angle = MvcGameConfig.INIT_ANGLE;
         power = MvcGameConfig.INIT_POWER;
-        this.shootingMode = new SingleShootingMode();
+        this.shootingMode = new DoubleShootingMode(); // Start with Double for easier gameplay
         shootingBatch = new ArrayList<AbstractMissile>();
     }
 
@@ -73,7 +73,7 @@ public class CannonA extends AbstractCannon {
         }else if(shootingMode instanceof DoubleShootingMode){
             shootingMode = new SingleShootingMode();
         }else {
-
+            shootingMode = new DoubleShootingMode(); // Fallback
         }
     }
 

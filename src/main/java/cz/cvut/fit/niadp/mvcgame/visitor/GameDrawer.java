@@ -54,7 +54,12 @@ public class GameDrawer implements IVisitor{
         }
 
         // Get shooting mode
-        String shootingMode = cannon.getShootingMode() instanceof DoubleShootingMode ? "Double" : "Single";
+        String shootingMode;
+        if (cannon.getShootingMode() instanceof DoubleShootingMode) {
+            shootingMode = "Double";
+        } else {
+            shootingMode = "Single";
+        }
 
         // Draw HUD information
         int startY = 20;

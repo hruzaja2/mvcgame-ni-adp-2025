@@ -31,10 +31,6 @@ public class MissilePool {
         }
     }
 
-    /**
-     * Gets a missile from the pool
-     * Returns null if pool is empty (all missiles in use)
-     */
     public AbstractMissile acquire(Position position, double angle, int velocity, IMovingStrategy strategy) {
         if (availableMissiles.isEmpty()) {
             return null; // No missiles available
@@ -45,25 +41,16 @@ public class MissilePool {
         return missile;
     }
 
-    /**
-     * Returns a missile back to the pool for reuse
-     */
     public void release(AbstractMissile missile) {
         if (availableMissiles.size() < poolSize) {
             availableMissiles.add(missile);
         }
     }
 
-    /**
-     * Returns number of available missiles in pool
-     */
     public int getAvailableCount() {
         return availableMissiles.size();
     }
 
-    /**
-     * Returns number of missiles currently in use
-     */
     public int getInUseCount() {
         return poolSize - availableMissiles.size();
     }
