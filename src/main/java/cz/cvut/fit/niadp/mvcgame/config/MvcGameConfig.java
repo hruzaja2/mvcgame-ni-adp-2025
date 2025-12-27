@@ -27,5 +27,12 @@ public class MvcGameConfig {
     public static final int MAX_MISSILES = 70;
     public static final int INIT_LIVES = 5;
 
+    // Difficulty level names
+    public static final String DIFFICULTY_BEGINNER = "Beginner";
+    public static final String DIFFICULTY_EASY = "Easy";
+    public static final String DIFFICULTY_MEDIUM = "Medium";
+    public static final String DIFFICULTY_HARD = "Hard";
+    public static final String DIFFICULTY_EXPERT = "Expert";
+    public static final String DIFFICULTY_NIGHTMARE = "Nightmare";
 
 }

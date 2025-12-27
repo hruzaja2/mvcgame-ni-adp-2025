@@ -1,5 +1,7 @@
 package cz.cvut.fit.niadp.mvcgame.strategy.difficulty;
 
+import cz.cvut.fit.niadp.mvcgame.config.MvcGameConfig;
+
 /**
  * Expert difficulty - very fast enemy spawn rate.
  * Suitable for levels 7-9 (300-449 score).
@@ -13,6 +15,6 @@ public class ExpertDifficultyStrategy implements IDifficultyStrategy {
 
     @Override
     public String getName() {
-        return "Expert";
+        return MvcGameConfig.DIFFICULTY_EXPERT;
     }
 }

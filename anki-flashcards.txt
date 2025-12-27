@@ -1,0 +1,60 @@
+Co dělá Abstract Factory pattern?	Vytváří různé "rodiny" herních objektů (dělo, střely, nepřátele). Factory má metody createCannon(), createMissile(), createEnemy() a vrací správné typy objektů podle rodiny.
+Kde je implementován Abstract Factory?	IGameObjectsFactory (interface), GameObjectsFactoryA (implementace pro rodinu A). Používá se v GameModel při vytváření objektů.
+Proč používáš Abstract Factory?	Chci mít možnost vytvářet různé typy objektů bez pevné závislosti na konkrétních třídách. Když buduchtít jinou "rodinu" objektů, jen vyměním factory.
+Co dělá Strategy pattern?	Mění chování objektu za běhu. Používám ho pro pohyb střel (Simple/Random/Real) a pro obtížnost (Easy/Medium/Hard).
+Jak funguje Strategy pattern pro pohyb střel?	Každá strategie má metodu updatePosition(). SimpleMovingStrategy pohybuje střely rovně, RealMovingStrategy používá fyziku s gravitací, RandomMovingStrategy pohybuje náhodně.
+Kde přepínám mezi strategiemi?	Klávesa M přepíná MovingStrategy. GameModel má metodu toggleMovingStrategy() která cyklicky mění strategii.
+Co dělá Strategy pattern pro obtížnost?	DifficultyManager podle skóre vybírá strategii obtížnosti. Každá strategie má getSpawnInterval() - čím těžší level, tím rychlejší spawn nepřátel.
+Jak funguje zvyšování obtížnosti?	Každých 50 bodů se zvýší level. DifficultyManager.updateDifficulty() podle levelu vybere strategii (Beginner/Easy/Medium/Hard/Expert/Nightmare).
+Co dělá State pattern?	Mění chování objektu podle jeho vnitřního stavu. Používám ho pro režimy střelby děla (Single/Double).
+Jak funguje SingleShootingMode?	Má metodu shoot() která zavolá cannon.primitiveShoot() jednou - vystřelí 1 střelu.
+Jak funguje DoubleShootingMode?	Posune dělo nahoru, vystřelí, posune dolů, vystřelí, vrátí zpět. Střely vychází z různých Y pozic.
+Proč DoubleShootingMode používá posun pozice místo úhlu?	Původně měnil úhel, ale SimpleMovingStrategy ignoruje úhly. Posun pozice funguje ve všech strategiích - střely jsou viditelné i když letí rovně.
+Jak se přepíná shooting mode?	Klávesa N volá toggleShootingMode(). Cyklus: Single → Double → Single.
+Co dělá Command pattern?	Každá akce (stisk klávesy) je objekt. Používám ho pro ovládání hry a pro UNDO funkci.
+Jaké commdy máš v projektu?	MoveUpCommand, MoveDownCommand, ShootCommand, AimUpCommand, AimDownCommand, PowerUpCommand, PowerDownCommand, ToggleShootingModeCommand, atd.
+Jak funguje UNDO (klávesa C)?	Každý command si při execute() uloží snapshot stavu pomocí mementa. Při undo() obnoví uložený stav. Commands jsou ve Stacku, pop() vrátí poslední.
+Kde se ukládají commdy?	GameModel má unexecutedCommands (fronta příkazů k provedení) a executedCommands (Stack provedených příkazů pro undo).
+Co dělá Memento pattern?	Ukládá a obnovuje celý stav objektu (snapshot). Používám ho pro Command undo a pro save/load hry.
+Jaké dva typy mementa máš?	1) GameModelSnapshot (vnitřní třída) - pro Command undo, rychlý snapshot aktuálního stavu. 2) GameSaveState - pro uložení do JSON souboru (F5/F9).
+Jak funguje save/load do souboru?	F5 uloží stav jako JSON pomocí Gson knihovny. F9 načte JSON a obnoví stav. GameSaveState je POJO s gettery/settery pro serializaci.
+Co je CareTaker a k čemu slouží?	Správce memento objektů. Má Stack<Object> mementos. createMemento() přidá snapshot, restoreMemento() obnoví poslední. CareTaker NEVÍ co je uvnitř mementa.
+Proč CareTaker neví co je v mementu?	To je princip Memento patternu - CareTaker je jen "hloupý" zásobník. Chrání to zapouzdření - jen Originator (GameModel) ví jak vytvořit a obnovit snapshot.
+Je CareTaker Singleton?	Ano! Používá Bill Pugh implementaci - private static třída SingletonHolder s INSTANCE. getInstance() vrací jedinečnou instanci.
+Co dělá Proxy pattern?	GameModelProxy je prostředník mezi Controllerem a GameModelem. Kontroluje přístup - když je pauza nebo game over, nepustí některé příkazy dál.
+Proč používáš Proxy?	Bezpečnost a kontrola přístupu. Model se nemusí starat o kontrolu pauzy/game over - to dělá Proxy před tím než pustí volání k modelu.
+Co dělá Observer pattern?	Model notifikuje View o změnách. View je observer, Model je subject. Když se něco změní, Model zavolá notifyObservers() a View se překreslí.
+Proč používáš Observer?	Implementuje MVC vztah. Model nemusí znát View - jen zavolá notifyObservers(). Díky tomu je Model nezávislý na způsobu zobrazení.
+Co dělá Visitor pattern?	Odděluje logiku vykreslování od herních objektů. GameDrawer je visitor, každý objekt má accept(visitor) metodu.
+Jak funguje Visitor v tvém projektu?	GameDrawer má metody visit(AbstractCannon), visit(AbstractMissile), visit(AbstractEnemy), visit(GameInfo). Každý objekt zavolá visitor.visit(this).
+Proč používáš Visitor pro kreslení?	Logika kreslení je oddělená od herních objektů. Můžu snadno přidat nový typ vykreslování (např. ASCII art) bez změny herních objektů.
+Co dělá Decorator pattern?	Přidává schopnosti objektům dynamicky. Používám ho pro power-upy střel - ExplosiveMissile, FastMissile, PiercingMissile.
+Jak funguje kombinace decoratorů?	Můžu je vnořit: FastMissile(ExplosiveMissile(basicMissile)) = rychlá výbušná střela. Každý decorator přidává funkcionalitu.
+Jaké power-upy máš?	Explosive (klávesa E, větší damage), Fast (klávesa Q, rychlejší), Piercing (klávesa W, prochází skrz nepřátele). Dají se kombinovat.
+Co dělá Object Pool pattern?	Recykluje objekty místo vytváření nových. Střely se vrací do poolu místo mazání.
+Proč používáš Object Pool pro střely?	Střel se vytváří hodně. Pool šetří paměť a CPU - nevytváří/neruší objekty pořád dokola. Pool má 70 střel připravených.
+Jak funguje MissilePool?	acquire() vezme střelu z poolu (nebo vytvoří novou pokud je pool prázdný). release() vrátí střelu zpět do poolu. Má availableMissiles a inUseMissiles.
+Co dělá Bridge pattern?	Odděluje abstrakci (co se kreslí) od implementace (jak se kreslí). IGameGraphics je interface, může mít různé implementace.
+Proč používáš Bridge?	Můžu změnit způsob kreslení (JavaFX, Swing, konzole) bez změny herní logiky. Hra jen volá drawImage() a neví jak se to kreslí.
+Kde je Singleton pattern?	CareTaker používá Singleton (Bill Pugh implementace). Config konstanty (MvcGameConfig) jsou statické - nepřímo Singleton princip.
+Co je MVC architektura?	Model (GameModel - logika a data), View (GameView - zobrazení), Controller (GameController - zpracování vstupu). Observer pattern propojuje M a V.
+Kde začíná herní smyčka?	AnimationTimer v MvcGameJavaFxLauncher volá processPressedKeys() ~60× za sekundu. Ta zavolá model.update() kde se děje vše (pohyb, spawn, kolize).
+Co se děje v model.update()?	1) executeCommands(), 2) frameCount++, 3) moveMissiles(), 4) moveEnemies(), 5) spawnEnemies(), 6) checkCollisions().
+Jak funguje spawn nepřátel?	Každý frame: if(frameCount % spawnInterval == 0) spawn. Spawn interval závisí na obtížnosti (60 framů na Easy, 15 na Nightmare).
+Kolik máš testů?	15 testů v 5 testovacích třídách (GameModelBasicTest, GameModelReflectionTest, GameModelMockedTest, ObserverPatternMockedTest, MissilePoolTest).
+Jak spustíš testy?	./gradlew test - spustí všechny testy. HTML report: build/reports/tests/test/index.html
+Co znamená "4 actionable tasks"?	To jsou Gradle úlohy (compileJava, testClasses, test...), NE počet testů! Skutečný počet testů je 15.
+Kolik lives má hráč na začátku?	5 životů (zvýšeno z 3 pro snazší začátek).
+Jak funguje Level 1?	Speciální "Beginner" obtížnost - spawn každých 120 framů (2 sekundy). Hodně pomalé pro začátečníky.
+Jak se mění obtížnost během hry?	Každých 50 bodů nový level. Level 1 = Beginner, 2-3 = Easy, 4-5 = Medium, 6-7 = Hard, 8-10 = Expert, 11+ = Nightmare.
+Co je frameCount?	Počítadlo framů (každý frame ++). Používá se pro timing spawnu nepřátel a pro fyziku v RealMovingStrategy.
+Jakou knihovnu používáš pro JSON?	Gson (Google JSON library) - serializuje/deserializuje GameSaveState do/z JSON souboru.
+Kde jsou uloženy konfigurace?	MvcGameConfig.java - konstanty jako MAX_X, MAX_Y, INIT_LIVES, MOVE_STEP, ANGLE_STEP, atd.
+Co je GameInfo?	Herní objekt který drží skóre, lives, gameOver flag. Visitor ho používá k vykreslení HUD.
+Jak se detekují kolize?	checkCollisions() v GameModel - kontroluje průnik BoundingBoxů střel a nepřátel. Při kolizi: skóre++, smaž nepřítele, vrať střelu do poolu.
+Co je IGameModel interface?	Interface který implementuje GameModel. Proxy a CareTaker používají tento interface - díky tomu nezávisí na konkrétní implementaci.
+Proč používáš interface místo konkrétní třídy?	Dependency Inversion Principle - závislosti na abstrakci (interface), ne na implementaci. Díky tomu můžu vyměnit implementaci bez změny kódu.
+Můžeš mít interface jako typ proměnné?	Ano! private IGameModel model; - typ je interface, ale uložený objekt je GameModel nebo GameModelProxy (implementace interface).
+Jaké klávesy ovládají hru?	UP/DOWN (pohyb), A/Y (aim), F/D (power), SPACE (shoot), N (shooting mode), M (strategy), P (pause), S/X (snapshot), F5/F9 (save/load), R (restart), H (help).
+Co dělá Object Pool když je plný?	Když pool nemá volné střely (všech 70 používaných), acquire() vrátí null. Cannon pak nepřidá střelu do shootingBatch.
+Proč se při Double mode posunuje dělo?	Aby střely měly různé výchozí Y pozice. To funguje i v Simple módu kde by různé úhly nepomohly (Simple ignoruje úhly).

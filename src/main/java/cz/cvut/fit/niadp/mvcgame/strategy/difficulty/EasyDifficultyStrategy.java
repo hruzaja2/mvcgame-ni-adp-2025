@@ -1,5 +1,7 @@
 package cz.cvut.fit.niadp.mvcgame.strategy.difficulty;
 
+import cz.cvut.fit.niadp.mvcgame.config.MvcGameConfig;
+
 /**
  * Easy difficulty - slowest enemy spawn rate.
  * Suitable for levels 1-2 (0-99 score).
@@ -13,6 +15,6 @@ public class EasyDifficultyStrategy implements IDifficultyStrategy {
 
     @Override
     public String getName() {
-        return "Easy";
+        return MvcGameConfig.DIFFICULTY_EASY;
     }
 }

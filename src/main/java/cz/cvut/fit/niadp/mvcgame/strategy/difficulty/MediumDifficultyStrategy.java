@@ -1,5 +1,7 @@
 package cz.cvut.fit.niadp.mvcgame.strategy.difficulty;
 
+import cz.cvut.fit.niadp.mvcgame.config.MvcGameConfig;
+
 /**
  * Medium difficulty - moderate enemy spawn rate.
  * Suitable for levels 3-4 (100-199 score).
@@ -13,6 +15,6 @@ public class MediumDifficultyStrategy implements IDifficultyStrategy {
 
     @Override
     public String getName() {
-        return "Medium";
+        return MvcGameConfig.DIFFICULTY_MEDIUM;
     }
 }

@@ -1,5 +1,6 @@
 package cz.cvut.fit.niadp.mvcgame.model;
 
+import cz.cvut.fit.niadp.mvcgame.config.MvcGameConfig;
 import cz.cvut.fit.niadp.mvcgame.strategy.difficulty.EasyDifficultyStrategy;
 import cz.cvut.fit.niadp.mvcgame.strategy.difficulty.ExpertDifficultyStrategy;
 import cz.cvut.fit.niadp.mvcgame.strategy.difficulty.HardDifficultyStrategy;
@@ -73,7 +74,7 @@ public class DifficultyManager {
                 }
                 @Override
                 public String getName() {
-                    return "Beginner";
+                    return MvcGameConfig.DIFFICULTY_BEGINNER;
                 }
             };
         } else if (level <= 3) {
