@@ -185,4 +185,24 @@ public class GameModelProxy implements IGameModel{
     public void undoLastCommand() {
         subject.undoLastCommand();
     }
+
+    @Override
+    public boolean isGameOver() {
+        return subject.isGameOver();
+    }
+
+    @Override
+    public void restartGame() {
+        subject.restartGame();
+    }
+
+    @Override
+    public void togglePause() {
+        subject.togglePause();
+    }
+
+    @Override
+    public boolean isPaused() {
+        return subject.isPaused();
+    }
 }

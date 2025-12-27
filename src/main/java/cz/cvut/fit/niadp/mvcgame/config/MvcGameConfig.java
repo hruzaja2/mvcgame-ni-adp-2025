@@ -23,6 +23,7 @@ public class MvcGameConfig {
     public static final int MAGIC_TIME_CONST = 100;
 
     public static final int MAX_MISSILES = 70;
+    public static final int INIT_LIVES = 3;
 
 
 }

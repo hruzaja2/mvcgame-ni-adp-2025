@@ -61,20 +61,38 @@ public class GameDrawer implements IVisitor{
         int lineHeight = 20;
 
         gameGraphics.drawText("Score: " + gameInfo.getScore(), new Position(10, startY));
-        gameGraphics.drawText("Angle: " + String.format("%.1f", cannon.getAngle()), new Position(10, startY + lineHeight));
-        gameGraphics.drawText("Power: " + cannon.getPower(), new Position(10, startY + 2 * lineHeight));
-        gameGraphics.drawText("Mode: " + shootingMode, new Position(10, startY + 3 * lineHeight));
-        gameGraphics.drawText("Strategy: " + strategyName, new Position(10, startY + 4 * lineHeight));
+        gameGraphics.drawText("Lives: " + gameInfo.getLives(), new Position(10, startY + lineHeight));
+        gameGraphics.drawText("Angle: " + String.format("%.1f", cannon.getAngle()), new Position(10, startY + 2 * lineHeight));
+        gameGraphics.drawText("Power: " + cannon.getPower(), new Position(10, startY + 3 * lineHeight));
+        gameGraphics.drawText("Mode: " + shootingMode, new Position(10, startY + 4 * lineHeight));
+        gameGraphics.drawText("Strategy: " + strategyName, new Position(10, startY + 5 * lineHeight));
 
         // Power-ups display
         String powerups = "Power-ups: ";
         if(model.isExplosiveMissiles()) powerups += "[E]Explosive ";
         if(model.isFastMissiles()) powerups += "[Q]Fast ";
-        if(model.isPiercingMissiles()) powerups += "[P]Piercing ";
+        if(model.isPiercingMissiles()) powerups += "[W]Piercing ";
         if(!model.isExplosiveMissiles() && !model.isFastMissiles() && !model.isPiercingMissiles()) {
             powerups += "None";
         }
-        gameGraphics.drawText(powerups, new Position(10, startY + 5 * lineHeight));
+        gameGraphics.drawText(powerups, new Position(10, startY + 6 * lineHeight));
+
+        // Pause message
+        if(model.isPaused()) {
+            int centerX = 960; // Half of MAX_X (1920)
+            int centerY = 400;
+            gameGraphics.drawText("=== PAUSED ===", new Position(centerX - 80, centerY));
+            gameGraphics.drawText("Press P to resume", new Position(centerX - 90, centerY + 40));
+        }
+
+        // Game Over message
+        if(gameInfo.isGameOver()) {
+            int centerX = 960; // Half of MAX_X (1920)
+            int centerY = 400;
+            gameGraphics.drawText("=== GAME OVER ===", new Position(centerX - 100, centerY));
+            gameGraphics.drawText("Final Score: " + gameInfo.getScore(), new Position(centerX - 80, centerY + 40));
+            gameGraphics.drawText("Press R to restart", new Position(centerX - 90, centerY + 80));
+        }
 
         // Help text
         if(model.isShowHelp()) {
@@ -98,15 +116,17 @@ public class GameDrawer implements IVisitor{
             gameGraphics.drawText("Power-ups:", new Position(helpX, helpY + line++ * helpLineHeight));
             gameGraphics.drawText("  E - Explosive missiles", new Position(helpX, helpY + line++ * helpLineHeight));
             gameGraphics.drawText("  Q - Fast missiles", new Position(helpX, helpY + line++ * helpLineHeight));
-            gameGraphics.drawText("  P - Piercing missiles", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  W - Piercing missiles", new Position(helpX, helpY + line++ * helpLineHeight));
             line++;
             gameGraphics.drawText("Other:", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  P - Pause/Resume", new Position(helpX, helpY + line++ * helpLineHeight));
             gameGraphics.drawText("  S - Save snapshot", new Position(helpX, helpY + line++ * helpLineHeight));
             gameGraphics.drawText("  X - Restore snapshot", new Position(helpX, helpY + line++ * helpLineHeight));
             gameGraphics.drawText("  C - Undo last command", new Position(helpX, helpY + line++ * helpLineHeight));
+            gameGraphics.drawText("  R - Restart game", new Position(helpX, helpY + line++ * helpLineHeight));
             gameGraphics.drawText("  ESC - Exit game", new Position(helpX, helpY + line++ * helpLineHeight));
         } else {
-            gameGraphics.drawText("Press H for help", new Position(10, startY + 6 * lineHeight));
+            gameGraphics.drawText("Press H for help", new Position(10, startY + 7 * lineHeight));
         }
     }
 

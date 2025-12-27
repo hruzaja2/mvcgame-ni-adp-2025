@@ -8,10 +8,12 @@ import cz.cvut.fit.niadp.mvcgame.command.MoveCannonDownCommand;
 import cz.cvut.fit.niadp.mvcgame.command.MoveCannonUpCommand;
 import cz.cvut.fit.niadp.mvcgame.command.PowerDownCommand;
 import cz.cvut.fit.niadp.mvcgame.command.PowerUpCommand;
+import cz.cvut.fit.niadp.mvcgame.command.RestartGameCommand;
 import cz.cvut.fit.niadp.mvcgame.command.ShootCommand;
 import cz.cvut.fit.niadp.mvcgame.command.ToggleExplosiveCommand;
 import cz.cvut.fit.niadp.mvcgame.command.ToggleFastCommand;
 import cz.cvut.fit.niadp.mvcgame.command.ToggleHelpCommand;
+import cz.cvut.fit.niadp.mvcgame.command.TogglePauseCommand;
 import cz.cvut.fit.niadp.mvcgame.command.TogglePiercingCommand;
 import cz.cvut.fit.niadp.mvcgame.command.ToggleShootingModeCommand;
 import cz.cvut.fit.niadp.mvcgame.command.ToggleStrategyCommand;
@@ -79,6 +81,12 @@ public class GameController {
                     break;
                 case MvcGameKeys.TOGGLE_HELP_KEY:
                     model.registerCommand(new ToggleHelpCommand(model));
+                    break;
+                case MvcGameKeys.RESTART_GAME_KEY:
+                    model.registerCommand(new RestartGameCommand(model));
+                    break;
+                case MvcGameKeys.PAUSE_KEY:
+                    model.registerCommand(new TogglePauseCommand(model));
                     break;
                 default:
                     //nothing

@@ -25,9 +25,15 @@ public class MvcGameKeys {
     // Power-ups
     public static final String TOGGLE_EXPLOSIVE_KEY = "E";
     public static final String TOGGLE_FAST_KEY = "Q";
-    public static final String TOGGLE_PIERCING_KEY = "P";
+    public static final String TOGGLE_PIERCING_KEY = "W";
 
     // Help
     public static final String TOGGLE_HELP_KEY = "H";
+
+    // Restart
+    public static final String RESTART_GAME_KEY = "R";
+
+    // Pause
+    public static final String PAUSE_KEY = "P";
 
 }

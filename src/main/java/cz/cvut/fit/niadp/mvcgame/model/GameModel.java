@@ -45,6 +45,9 @@ public class GameModel implements IGameModel{
     // Help
     private boolean showHelp = false;
 
+    // Pause
+    private boolean isPaused = false;
+
     public GameModel(){
         movingStrategy = new RealMovingStrategy();
         missilePool = new MissilePool(MvcGameConfig.MAX_MISSILES, movingStrategy);
@@ -59,12 +62,19 @@ public class GameModel implements IGameModel{
     }
 
     public void update() {
+        // Execute commands first (allows restart and pause commands to work)
+        executeCommands();
+
+        // Don't update game if game over or paused
+        if(gameInfo.isGameOver() || isPaused){
+            return;
+        }
+
         frameCount++;
         moveMissiles();
         moveEnemies();
         spawnEnemies();
         checkCollisions();
-        executeCommands();
     }
 
     private void executeCommands(){
@@ -115,10 +125,24 @@ public class GameModel implements IGameModel{
             gameInfo.incrementScore(scoreGained);
         }
 
+        // Decrease lives for enemies that reached the left edge (escaped)
+        long escapedEnemies = enemiesToRemove.stream()
+            .filter(enemy -> enemy.getPosition().getX() < MvcGameConfig.MIN_X && enemy.isAlive())
+            .count();
+
+        for(int i = 0; i < escapedEnemies; i++){
+            gameInfo.decrementLives();
+        }
+
         enemies.removeAll(enemiesToRemove);
     }
 
     protected void spawnEnemies(){
+        // Don't spawn enemies if game is over
+        if(gameInfo.isGameOver()){
+            return;
+        }
+
         // Spawn enemy every 60 frames (roughly 1 second at 60 FPS)
         if(frameCount % 60 == 0){
             // Random Y position in the middle area of the screen
@@ -126,6 +150,40 @@ public class GameModel implements IGameModel{
             Position spawnPosition = new Position(MvcGameConfig.MAX_X, randomY);
             enemies.add(factory.createEnemy(spawnPosition));
         }
+    }
+
+    public boolean isGameOver(){
+        return gameInfo.isGameOver();
+    }
+
+    public void restartGame(){
+        // Clear all game objects
+        missiles.clear();
+        enemies.clear();
+
+        // Reset game info
+        gameInfo.setScore(0);
+        gameInfo.setLives(MvcGameConfig.INIT_LIVES);
+
+        // Reset cannon position and settings
+        cannon.getPosition().setX(MvcGameConfig.CANNON_POS_X);
+        cannon.getPosition().setY(MvcGameConfig.CANNON_POS_Y);
+        cannon.setAngle(MvcGameConfig.INIT_ANGLE);
+        cannon.setPower(MvcGameConfig.INIT_POWER);
+
+        // Reset power-ups
+        explosiveMissiles = false;
+        fastMissiles = false;
+        piercingMissiles = false;
+
+        // Reset frame count
+        frameCount = 0;
+
+        // Clear command history
+        executedCommands.clear();
+        unexecutedCommands.clear();
+
+        notifyObservers();
     }
 
     protected void checkCollisions(){
@@ -170,16 +228,19 @@ public class GameModel implements IGameModel{
     }
 
     public void moveCannonUp(){
+        if(gameInfo.isGameOver() || isPaused) return;
         cannon.moveUp();
         notifyObservers();
     }
 
     public void moveCannonDown(){
+        if(gameInfo.isGameOver() || isPaused) return;
         cannon.moveDown();
         notifyObservers();
     }
 
     public void cannonShoot(){
+        if(gameInfo.isGameOver() || isPaused) return;
         // No need to check missile limit - pool handles it automatically
         var newMissiles = cannon.shoot();
         // Filter out nulls (in case pool is empty)
@@ -192,18 +253,22 @@ public class GameModel implements IGameModel{
     }
 
     public void aimCannonUp() {
+        if(gameInfo.isGameOver() || isPaused) return;
         cannon.aimUp();
         notifyObservers();
     }
     public void aimCannonDown() {
+        if(gameInfo.isGameOver() || isPaused) return;
         cannon.aimDown();
         notifyObservers();
     }
     public void cannonPowerUp() {
+        if(gameInfo.isGameOver() || isPaused) return;
         cannon.powerUp();
         notifyObservers();
     }
     public void cannonPowerDown() {
+        if(gameInfo.isGameOver() || isPaused) return;
         cannon.powerDown();
         notifyObservers();
     }
@@ -245,6 +310,7 @@ public class GameModel implements IGameModel{
     }
 
     public void toggleMovingStrategy(){
+        if(gameInfo.isGameOver() || isPaused) return;
         /*if(movingStrategy instanceof SimpleMovingStrategy){
             movingStrategy = new RandomMovingStrategy();
         }else if(movingStrategy instanceof RandomMovingStrategy){
@@ -272,18 +338,22 @@ public class GameModel implements IGameModel{
     }
 
     public void toggleShootingMode(){
+        if(gameInfo.isGameOver() || isPaused) return;
         cannon.toggleShootingMode();
     }
 
     public void toggleExplosiveMissiles(){
+        if(gameInfo.isGameOver() || isPaused) return;
         explosiveMissiles = !explosiveMissiles;
     }
 
     public void toggleFastMissiles(){
+        if(gameInfo.isGameOver() || isPaused) return;
         fastMissiles = !fastMissiles;
     }
 
     public void togglePiercingMissiles(){
+        if(gameInfo.isGameOver() || isPaused) return;
         piercingMissiles = !piercingMissiles;
     }
 
@@ -307,6 +377,14 @@ public class GameModel implements IGameModel{
         return showHelp;
     }
 
+    public void togglePause(){
+        isPaused = !isPaused;
+    }
+
+    public boolean isPaused(){
+        return isPaused;
+    }
+
     private static class Memento{
         private int cannonPositionX;
         private int cannonPositionY;
@@ -315,6 +393,7 @@ public class GameModel implements IGameModel{
         private IShootingMode shootingMode;
         private IMovingStrategy movingStrategy;
         private int score;
+        private int lives;
     }
 
     public Object createMemento(){
@@ -326,6 +405,8 @@ public class GameModel implements IGameModel{
         gameModelSnapshot.shootingMode = cannon.getShootingMode();
         gameModelSnapshot.movingStrategy = movingStrategy;
         gameModelSnapshot.score = gameInfo.getScore();
+        // Don't save lives in command memento - lives loss should be permanent
+        // gameModelSnapshot.lives = gameInfo.getLives();
         return gameModelSnapshot;
     }
 
@@ -338,6 +419,8 @@ public class GameModel implements IGameModel{
         cannon.setShootingMode(gameModelSnapshot.shootingMode);
         movingStrategy = gameModelSnapshot.movingStrategy;
         gameInfo.setScore(gameModelSnapshot.score);
+        // Don't restore lives from command memento - lives loss should be permanent
+        // gameInfo.setLives(gameModelSnapshot.lives);
     }
 
     @Override
@@ -347,6 +430,7 @@ public class GameModel implements IGameModel{
 
     @Override
     public void undoLastCommand() {
+        if(gameInfo.isGameOver() || isPaused) return;
         if(!executedCommands.isEmpty()){
             executedCommands.pop().unExecute();
             notifyObservers();

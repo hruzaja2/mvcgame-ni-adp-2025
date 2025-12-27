@@ -40,8 +40,12 @@ public interface IGameModel extends IObservable {
     public boolean isPiercingMissiles();
     public void toggleHelp();
     public boolean isShowHelp();
+    public void togglePause();
+    public boolean isPaused();
     public Object createMemento();
     public void setMemento(Object memento);
     public void registerCommand(AbstractGameCommand command);
     public void undoLastCommand();
+    public boolean isGameOver();
+    public void restartGame();
 }
